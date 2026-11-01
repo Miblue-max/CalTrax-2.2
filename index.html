@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CalTraX PRO — Calorie &amp; Hydration Tracker</title>
+  <meta name="theme-color" content="#0284c7" />
+  <link rel="manifest" href="manifest.json" />
+  <!-- Crisp PWA Icons (SVG Inline + PNG fallback) to prevent blank icon on install -->
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23059669'/%3E%3Ccircle cx='50' cy='50' r='38' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M50 25 C65 25 75 40 75 55 C75 70 65 75 50 75 C35 75 25 70 25 55 C25 40 35 25 50 25 Z' fill='white'/%3E%3Cpath d='M50 35 C58 35 65 45 65 55 C65 65 58 68 50 68 C42 68 35 65 35 55 C35 45 42 35 50 35 Z' fill='%23059669'/%3E%3C/svg%3E" />
+  <!-- Tailwind CSS CDN with Emerald brand support -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    if (window.tailwind) tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/css/app.css" />
+</head>
+<body class="bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200">
+  <!-- ============================================================== -->
+  <!-- FULL-SCREEN ONBOARDING & SETUP WIZARD (FRESH INSTALL EXPERIENCE) -->
+  <!-- ============================================================== -->
+  <div id="onboarding-overlay" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 my-auto">
+      
+      <!-- Wizard Progress Dots -->
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-1.5" id="wizard-progress-dots">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 dot-step" data-step-dot="1"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 dot-step" data-step-dot="2"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 dot-step" data-step-dot="3"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 dot-step" data-step-dot="4"></span>
+        </div>
+        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400" id="wizard-step-counter">Step 1 of 4</span>
+      </div>
+
+      <!-- WIZARD STEP 1: WELCOME & LANGUAGE -->
+      <div id="wizard-step-1" class="wizard-step space-y-4">
+        <div class="text-center space-y-2.5 pt-2">
+          <!-- Official CalTraX PRO Logo Badge -->
+          <div class="w-20 h-20 rounded-3xl mx-auto shadow-md border border-slate-200/90 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 flex items-center justify-center p-1.5 transition-transform hover:scale-105">
+            <img src="src/assets/logo.png" alt="CalTraX PRO Logo" class="w-full h-full object-contain rounded-2xl shadow-xs" id="wz-app-logo" />
+          </div>
+          <div class="space-y-0.5">
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/80 border border-sky-200 dark:border-sky-800 text-[10px] font-black tracking-wider text-sky-700 dark:text-sky-300 uppercase">
+              Official CalTraX PRO
+            </span>
+            <h2 class="text-xl font-black text-slate-900 dark:text-white" id="wz-welcome-title">Welcome to CalTraX PRO</h2>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed" id="wz-welcome-sub">
+            Your private, scientific health tracker tailored for regional nutrition and clinical wellness.
+          </p>
+        </div>
+
+        <!-- Language Selector Pills -->
+        <div class="space-y-2 pt-2">
+          <label class="block text-xs font-extrabold text-slate-700 dark:text-slate-300" id="wz-choose-lang-label">Choose Your Preferred Language / ভাষা নির্বাচন করুন:</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" data-wz-lang="en" class="wz-lang-btn py-2.5 px-2 rounded-2xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-extrabold text-xs transition active:scale-95 text-center">
+              English
+            </button>
+            <button type="button" data-wz-lang="bn" class="wz-lang-btn py-2.5 px-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs transition active:scale-95 text-center">
+              বাংলা (Bengali)
+            </button>
+            <button type="button" data-wz-lang="hi" class="wz-lang-btn py-2.5 px-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs transition active:scale-95 text-center">
+              हिंदी (Hindi)
+            </button>
+          </div>
+        </div>
+
+        <button type="button" id="btn-wz-next-1" class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5 mt-4">
+          <span id="wz-btn-get-started">Get Started</span> <span>➔</span>
+        </button>
+      </div>
+
+      <!-- WIZARD STEP 2: PERSONAL METRICS -->
+      <div id="wizard-step-2" class="wizard-step hidden space-y-3.5">
+        <div>
+          <h3 class="text-base font-black text-slate-900 dark:text-white" id="wz-step2-title">Personal &amp; Body Metrics</h3>
+          <p class="text-xs text-slate-400" id="wz-step2-sub">We calculate your exact BMR and calories scientifically</p>
+        </div>
+
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <label for="wz-input-name" class="block font-bold text-slate-700 dark:text-slate-300 mb-1" id="wz-lbl-name">Your Name</label>
+            <input id="wz-input-name" type="text" placeholder="e.g. Chris / রাহুল / অনিতা" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-extrabold focus:ring-2 focus:ring-emerald-500 focus:outline-none" required />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="wz-input-age" class="block font-bold text-slate-700 dark:text-slate-300 mb-1" id="wz-lbl-age">Age</label>
+              <input id="wz-input-age" type="number" min="10" max="115" value="" placeholder="28" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-extrabold text-slate-900 dark:text-white" />
+            </div>
+            <div class="relative custom-dropdown-container" id="wz-dropdown-gender">
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1" id="wz-lbl-gender">Gender</label>
+              <button
+                type="button"
+                id="wz-btn-dropdown-gender"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-left flex items-center justify-between hover:border-emerald-500 transition shadow-xs font-extrabold text-slate-900 dark:text-white"
+              >
+                <span id="wz-display-gender" class="truncate">👨 Male</span>
+                <span class="text-[10px] text-emerald-600 font-black">▼</span>
+              </button>
+              <div
+                id="wz-menu-dropdown-gender"
+                class="hidden absolute z-50 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden divide-y divide-slate-100 dark:divide-slate-700 custom-popover"
+              >
+                <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-gender="male">
+                  <p class="font-bold text-slate-900 dark:text-white text-xs">👨 Male</p>
+                  <p class="text-[9px] text-slate-400">Mifflin-St Jeor (+5)</p>
+                </div>
+                <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-gender="female">
+                  <p class="font-bold text-slate-900 dark:text-white text-xs">👩 Female</p>
+                  <p class="text-[9px] text-slate-400">Mifflin-St Jeor (-161)</p>
+                </div>
+                <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-gender="transgender">
+                  <p class="font-bold text-emerald-600 dark:text-emerald-400 text-xs">⚧️ Transgender</p>
+                  <p class="text-[9px] text-slate-400">Balanced median BMR (-78)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="wz-input-height" class="block font-bold text-slate-700 dark:text-slate-300 mb-1" id="wz-lbl-height">Height (cm)</label>
+              <input id="wz-input-height" type="number" min="100" max="250" value="" placeholder="175" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-extrabold text-slate-900 dark:text-white" />
+            </div>
+            <div>
+              <label for="wz-input-weight" class="block font-bold text-slate-700 dark:text-slate-300 mb-1" id="wz-lbl-weight">Weight (kg)</label>
+              <input id="wz-input-weight" type="number" min="30" max="250" step="0.5" value="" placeholder="70" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-extrabold text-slate-900 dark:text-white" />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" id="btn-wz-back-2" class="py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition">
+            ❮ Back
+          </button>
+          <button type="button" id="btn-wz-next-2" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1">
+            <span id="wz-btn-next-step2">Next: Health Conditions</span> <span>➔</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- WIZARD STEP 3: HEALTH CONDITIONS & FITNESS -->
+      <div id="wizard-step-3" class="wizard-step hidden space-y-3.5">
+        <div>
+          <h3 class="text-base font-black text-slate-900 dark:text-white" id="wz-step3-title">Health Conditions &amp; Fitness</h3>
+          <p class="text-xs text-slate-400" id="wz-step3-sub">Help us customize medical nutrition rules for your body</p>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <!-- 1. Diabetic Status -->
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1" id="wz-lbl-diabetic">Diabetic Condition (ডায়াবেটিস)</label>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button type="button" data-cond-diabetic="none" class="cond-btn-diabetic py-2 px-1 rounded-xl bg-emerald-600 text-white font-extrabold text-[11px] text-center shadow-xs">
+                None (নেই)
+              </button>
+              <button type="button" data-cond-diabetic="prediabetic" class="cond-btn-diabetic py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[11px] text-center">
+                Pre-diabetic
+              </button>
+              <button type="button" data-cond-diabetic="type2" class="cond-btn-diabetic py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[11px] text-center">
+                Type 2 Diabetic
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Blood Pressure -->
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1" id="wz-lbl-bp">Blood Pressure (রক্তচাপ / হাই বিপি)</label>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button type="button" data-cond-bp="normal" class="cond-btn-bp py-2 px-1 rounded-xl bg-emerald-600 text-white font-extrabold text-[11px] text-center shadow-xs">
+                Normal (স্বাভাবিক)
+              </button>
+              <button type="button" data-cond-bp="prehypertension" class="cond-btn-bp py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[11px] text-center">
+                Borderline BP
+              </button>
+              <button type="button" data-cond-bp="high" class="cond-btn-bp py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[11px] text-center">
+                High BP (উচ্চ রক্তচাপ)
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Physical Fitness & Mobility -->
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1" id="wz-lbl-mobility">Physical Mobility / ফিটনেস ও হ্যান্ডিক্যাপ স্ট্যাটাস</label>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button type="button" data-cond-mobility="fully_mobile" class="cond-btn-mobility py-2 px-1 rounded-xl bg-emerald-600 text-white font-extrabold text-[11px] text-center shadow-xs">
+                🏃 Fully Mobile
+              </button>
+              <button type="button" data-cond-mobility="limited" class="cond-btn-mobility py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[11px] text-center">
+                🚶 Limited
+              </button>
+              <button type="button" data-cond-mobility="wheelchair" class="cond-btn-mobility py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[11px] text-center">
+                ♿ Specially Abled
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. Goal Selector Premium Popover -->
+          <div class="relative custom-dropdown-container" id="wz-dropdown-goal">
+            <label class="block font-bold text-emerald-700 dark:text-emerald-400 mb-1" id="wz-lbl-goal">Scientific Health Goal</label>
+            <button
+              type="button"
+              id="wz-btn-dropdown-goal"
+              class="w-full px-3 py-2 rounded-2xl border-2 border-emerald-500/80 bg-white dark:bg-slate-800 text-left flex items-center justify-between hover:border-emerald-600 transition shadow-xs font-extrabold text-slate-900 dark:text-white"
+            >
+              <div class="truncate pr-2">
+                <p id="wz-display-goal-title" class="text-xs font-black truncate">1. Muscle Retention &amp; Fat Loss</p>
+                <p id="wz-display-goal-sub" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">-350 kcal deficit, 2.0g/kg Pro</p>
+              </div>
+              <span class="text-xs text-emerald-600 font-black">▼</span>
+            </button>
+            <div
+              id="wz-menu-dropdown-goal"
+              class="hidden absolute z-50 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl max-h-52 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 custom-popover"
+            >
+              <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-goal-val="lean_cut">
+                <p class="font-black text-xs text-slate-900 dark:text-white">1. Muscle Retention &amp; Fat Loss</p>
+                <p class="text-[10px] text-slate-400">-350 kcal deficit, 2.0g/kg protein to preserve lean muscle</p>
+              </div>
+              <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-goal-val="recomp">
+                <p class="font-black text-xs text-slate-900 dark:text-white">2. Body Recomposition</p>
+                <p class="text-[10px] text-slate-400">-150 kcal, 2.2g/kg protein (lose fat &amp; build muscle)</p>
+              </div>
+              <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-goal-val="aggressive_cut">
+                <p class="font-black text-xs text-slate-900 dark:text-white">3. Rapid Fat Loss / Cutting</p>
+                <p class="text-[10px] text-slate-400">-500 kcal deficit for safe, accelerated fat burning</p>
+              </div>
+              <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-goal-val="maintain">
+                <p class="font-black text-xs text-slate-900 dark:text-white">4. Maintain Current Weight &amp; Vitality</p>
+                <p class="text-[10px] text-slate-400">Exact TDEE calorie balance for hormonal health &amp; energy</p>
+              </div>
+              <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-goal-val="clean_bulk">
+                <p class="font-black text-xs text-slate-900 dark:text-white">5. Clean Muscle Bulk</p>
+                <p class="text-[10px] text-slate-400">+250 kcal controlled surplus with 2.0g/kg protein</p>
+              </div>
+              <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-goal-val="heavy_bulk">
+                <p class="font-black text-xs text-slate-900 dark:text-white">6. Overall Weight &amp; Mass Gain</p>
+                <p class="text-[10px] text-slate-400">+500 kcal surplus with high complex carbs</p>
+              </div>
+              <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-wz-goal-val="athletic">
+                <p class="font-black text-xs text-slate-900 dark:text-white">7. Athletic Performance &amp; Stamina</p>
+                <p class="text-[10px] text-slate-400">+150 kcal, 60% high glycogen carbs for sports</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" id="btn-wz-back-3" class="py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition">
+            ❮ Back
+          </button>
+          <button type="button" id="btn-wz-next-3" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1">
+            <span id="wz-btn-calc-targets">Calculate My Targets</span> <span>➔</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- WIZARD STEP 4: SUMMARY & CONFIRMATION -->
+      <div id="wizard-step-4" class="wizard-step hidden space-y-4">
+        <div class="text-center space-y-1">
+          <span class="text-3xl">🎉</span>
+          <h3 class="text-base font-black text-slate-900 dark:text-white" id="wz-step4-title">Your Personalized Plan is Ready!</h3>
+          <p class="text-xs text-slate-400" id="wz-step4-sub">Calculated scientifically based on your health profile</p>
+        </div>
+
+        <!-- Calculated Target Grid -->
+        <div class="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-2.5 text-xs">
+          <div class="grid grid-cols-2 gap-2 text-center">
+            <div class="bg-white dark:bg-slate-800 p-2 rounded-xl">
+              <span class="text-[9px] text-slate-400 block font-bold" id="wz-lbl-summary-bmr">Basal Metabolic Rate</span>
+              <strong class="text-sm font-black text-slate-900 dark:text-white" id="wz-summary-bmr">1,520 kcal</strong>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-2 rounded-xl">
+              <span class="text-[9px] text-slate-400 block font-bold" id="wz-lbl-summary-cal">Locked Daily Target</span>
+              <strong class="text-sm font-black text-emerald-600 dark:text-emerald-400" id="wz-summary-cal">1,740 kcal</strong>
+            </div>
+          </div>
+
+          <div class="p-2.5 bg-white/80 dark:bg-slate-800/80 rounded-xl space-y-1">
+            <div class="flex items-center justify-between font-black text-[11px]">
+              <span class="text-purple-600" id="wz-summary-pro-lbl">Pro: <strong id="wz-summary-pro">140</strong>g</span>
+              <span class="text-amber-600" id="wz-summary-carbs-lbl">Carbs: <strong id="wz-summary-carbs">180</strong>g</span>
+              <span class="text-rose-600" id="wz-summary-fat-lbl">Fats: <strong id="wz-summary-fat">51</strong>g</span>
+            </div>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1" id="wz-summary-advice">
+              <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 inline-flex items-center justify-center align-middle mr-1 shrink-0"><svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Targets are locked to prevent starvation and ensure healthy metabolism.
+            </p>
+          </div>
+        </div>
+
+        <button type="button" id="btn-wz-finish" class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-1.5">
+          <span id="wz-btn-start-journey">🚀 Start Tracking (ড্যাশবোর্ডে যান)</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Floating Toast Notification (Positioned at Lower Two-Thirds with Premium SVG Checkmark) -->
+  <div id="toast-message" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 text-xs font-bold shadow-2xl flex items-center gap-2.5 pointer-events-none transition-all duration-200 border border-slate-700/60 dark:border-slate-200 max-w-[90%]">
+    <!-- Premium Circular SVG Checkmark Icon -->
+    <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 dark:text-emerald-600 flex items-center justify-center shrink-0">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </span>
+    <span id="toast-text" class="leading-tight">Food added</span>
+  </div>
+
+  
+  <!-- ============================================================== -->
+  <!-- INTERACTIVE HYDRATION POP-UP MODAL (REAL-WORLD DRINKING METHODS) -->
+  <!-- ============================================================== -->
+  <div id="hydration-modal-overlay" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 my-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-50 dark:bg-cyan-950/80 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center text-xl shadow-xs">
+            💧
+          </div>
+          <div>
+            <h2 class="text-sm sm:text-base font-black text-slate-900 dark:text-white" id="hyd-modal-title">Hydration Studio</h2>
+            <p class="text-[10px] text-slate-400 font-semibold" id="hyd-modal-sub">How did you hydrate? Pick your method</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          id="btn-close-hydration-modal"
+          class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white text-xs font-black flex items-center justify-center transition active:scale-95"
+          title="Close Modal"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Live Hydration Goal Status Card -->
+      <div class="p-3.5 rounded-2xl bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-slate-800/80 dark:to-cyan-950/30 border border-cyan-200/80 dark:border-cyan-800/60 space-y-2">
+        <div class="flex items-center justify-between text-xs font-black">
+          <span class="text-cyan-900 dark:text-cyan-200" id="hyd-modal-today-label">Today's Intake</span>
+          <span class="text-cyan-700 dark:text-cyan-400">
+            <strong id="modal-water-curr" class="text-sm font-black">0</strong> / <span id="modal-water-goal">2,500</span> ml (<span id="modal-water-pct">0%</span>)
+          </span>
+        </div>
+        <!-- Animated Progress Bar -->
+        <div class="w-full h-2.5 bg-white dark:bg-slate-800 rounded-full overflow-hidden shadow-inner p-0.5">
+          <div id="modal-water-bar" class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div class="flex items-center justify-between text-[10px]">
+          <span id="modal-water-status-badge" class="font-extrabold px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300">
+            💧 Need hydration
+          </span>
+          <span class="text-slate-400 font-semibold" id="modal-water-remaining-text">2,500 ml remaining</span>
+        </div>
+      </div>
+
+      <!-- Natural Drinking Methods Grid (User Requested: Sip, Gulp, Chug, Bottle, etc.) -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider" id="lbl-drink-methods">
+          Select Drinking Method / জল পানের পদ্ধতি:
+        </label>
+        
+        <div class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto no-scrollbar pr-0.5">
+          
+          <!-- Method 1: Sip -->
+          <button
+            type="button"
+            data-modal-water="25"
+            class="btn-modal-drink-method p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition shadow-xs active:scale-95 flex items-start gap-2 group"
+          >
+            <span class="text-xl shrink-0 mt-0.5 group-hover:scale-110 transition-transform">🍵</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-extrabold text-slate-900 dark:text-white" id="hyd-method-sip-title">Sip</p>
+                <span class="text-[10px] font-black text-cyan-600 dark:text-cyan-400">+25ml</span>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5" id="hyd-method-sip-sub">1 small healthy sip (ছোট চুমুক)</p>
+            </div>
+          </button>
+
+          <!-- Method 2: Gulp / Mouthful Swallow -->
+          <button
+            type="button"
+            data-modal-water="50"
+            class="btn-modal-drink-method p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition shadow-xs active:scale-95 flex items-start gap-2 group"
+          >
+            <span class="text-xl shrink-0 mt-0.5 group-hover:scale-110 transition-transform">🥤</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-extrabold text-slate-900 dark:text-white" id="hyd-method-gulp-title">Gulp</p>
+                <span class="text-[10px] font-black text-cyan-600 dark:text-cyan-400">+50ml</span>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5" id="hyd-method-gulp-sub">1 full mouthful gulp (মুখভর্তি ঢোক)</p>
+            </div>
+          </button>
+
+          <!-- Method 3: Continuous Bottle Chug -->
+          <button
+            type="button"
+            data-modal-water="150"
+            class="btn-modal-drink-method p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition shadow-xs active:scale-95 flex items-start gap-2 group"
+          >
+            <span class="text-xl shrink-0 mt-0.5 group-hover:scale-110 transition-transform">🍶</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-extrabold text-slate-900 dark:text-white" id="hyd-method-chug-title">Bottle Chug</p>
+                <span class="text-[10px] font-black text-cyan-600 dark:text-cyan-400">+150ml</span>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5" id="hyd-method-chug-sub">3-4 gulps from bottle (একটানা ঢকঢক)</p>
+            </div>
+          </button>
+
+          <!-- Method 4: 1 Glass / Tumbler -->
+          <button
+            type="button"
+            data-modal-water="250"
+            class="btn-modal-drink-method p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition shadow-xs active:scale-95 flex items-start gap-2 group"
+          >
+            <span class="text-xl shrink-0 mt-0.5 group-hover:scale-110 transition-transform">🥛</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-extrabold text-slate-900 dark:text-white" id="hyd-method-glass-title">1 Glass</p>
+                <span class="text-[10px] font-black text-cyan-600 dark:text-cyan-400">+250ml</span>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5" id="hyd-method-glass-sub">Standard tumbler (১ গ্লাস জল)</p>
+            </div>
+          </button>
+
+          <!-- Method 5: Half Bottle -->
+          <button
+            type="button"
+            data-modal-water="500"
+            class="btn-modal-drink-method p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition shadow-xs active:scale-95 flex items-start gap-2 group"
+          >
+            <span class="text-xl shrink-0 mt-0.5 group-hover:scale-110 transition-transform">🍼</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-extrabold text-slate-900 dark:text-white" id="hyd-method-half-title">Half Bottle</p>
+                <span class="text-[10px] font-black text-cyan-600 dark:text-cyan-400">+500ml</span>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5" id="hyd-method-half-sub">500ml water bottle (অর্ধেক বোতল)</p>
+            </div>
+          </button>
+
+          <!-- Method 6: Full 1L Bottle -->
+          <button
+            type="button"
+            data-modal-water="1000"
+            class="btn-modal-drink-method p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition shadow-xs active:scale-95 flex items-start gap-2 group"
+          >
+            <span class="text-xl shrink-0 mt-0.5 group-hover:scale-110 transition-transform">🍾</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-extrabold text-slate-900 dark:text-white" id="hyd-method-full-title">Full 1L Bottle</p>
+                <span class="text-[10px] font-black text-cyan-600 dark:text-cyan-400">+1000ml</span>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5" id="hyd-method-full-sub">Gym/office 1 liter bottle (পুরো বোতল)</p>
+            </div>
+          </button>
+
+          <!-- Method 7: Coconut Water -->
+          <button
+            type="button"
+            data-modal-water="250"
+            class="btn-modal-drink-method p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition shadow-xs active:scale-95 flex items-start gap-2 group"
+          >
+            <span class="text-xl shrink-0 mt-0.5 group-hover:scale-110 transition-transform">🥥</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-extrabold text-slate-900 dark:text-white" id="hyd-method-coco-title">Coconut Water</p>
+                <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400">+250ml</span>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5" id="hyd-method-coco-sub">Natural electrolyte (ডাবের জল)</p>
+            </div>
+          </button>
+
+          <!-- Method 8: Warm Lemon Water -->
+          <button
+            type="button"
+            data-modal-water="200"
+            class="btn-modal-drink-method p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition shadow-xs active:scale-95 flex items-start gap-2 group"
+          >
+            <span class="text-xl shrink-0 mt-0.5 group-hover:scale-110 transition-transform">🍋</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-extrabold text-slate-900 dark:text-white" id="hyd-method-lemon-title">Warm Lemon Water</p>
+                <span class="text-[10px] font-black text-amber-600 dark:text-amber-400">+200ml</span>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5" id="hyd-method-lemon-sub">Digestion & detox (উষ্ণ লেবু-জল)</p>
+            </div>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Custom ML Input Box & Quick Undo Buttons -->
+      <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+        <div class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <input
+              id="inp-custom-water-ml"
+              type="number"
+              min="5"
+              max="3000"
+              step="5"
+              placeholder="Custom ml (যেমন 120)"
+              class="w-full pl-3 pr-8 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-xs font-extrabold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">ml</span>
+          </div>
+          <button
+            type="button"
+            id="btn-log-custom-water"
+            class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white font-extrabold text-xs shadow-sm transition shrink-0"
+          >
+            + Log ml
+          </button>
+        </div>
+
+        <!-- Undo buttons -->
+        <div class="flex items-center justify-between text-[11px] pt-1">
+          <span class="text-slate-400 font-semibold" id="lbl-undo-water">Correction / ভুল হলে বিয়োগ:</span>
+          <div class="flex items-center gap-1.5">
+            <button type="button" data-modal-minus="25" class="btn-modal-minus-water px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-rose-600 dark:text-rose-400 font-bold hover:bg-rose-50 text-[10px] transition">-25ml</button>
+            <button type="button" data-modal-minus="50" class="btn-modal-minus-water px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-rose-600 dark:text-rose-400 font-bold hover:bg-rose-50 text-[10px] transition">-50ml</button>
+            <button type="button" data-modal-minus="250" class="btn-modal-minus-water px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-rose-600 dark:text-rose-400 font-bold hover:bg-rose-50 text-[10px] transition">-250ml</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- Main Mobile App Shell -->
+  <div class="max-w-md mx-auto min-h-screen flex flex-col justify-between">
+
+    <!-- TOP BAR (User Greeting, Date Switcher, Dark Mode) -->
+    <header class="p-4 pb-2 space-y-3 shrink-0">
+      <div class="flex items-center justify-between">
+        <div>
+          <p id="header-greeting-label" class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Good morning</p>
+          <h1 id="user-display-name" class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">Welcome</h1>
+          <div class="flex items-center gap-1.5 mt-1">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400">
+              <span id="lbl-bmr-tag">BMR</span>: <span id="header-bmr-val">1,520</span> kcal
+            </span>
+            <!-- Live Phone Device Time & Timezone Sync Badge -->
+            <button
+              type="button"
+              id="phone-clock-badge"
+              class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-1 transition shadow-xs cursor-pointer active:scale-95"
+              title="Synchronized live with phone device time and timezone"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="phone-live-time">--:--</span>
+              <span class="text-[9px] text-slate-500 dark:text-slate-400" id="phone-tz-name">IST</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Quick Language Switcher Button -->
+          <button
+            id="lang-quick-toggle-btn"
+            type="button"
+            class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm text-xs font-black text-slate-700 dark:text-slate-200 hover:scale-105 active:scale-95 transition flex items-center gap-1"
+            title="Switch Language / ভাষা পরিবর্তন"
+          >
+            <span class="text-xs">🌐</span>
+            <span id="current-lang-code">BN</span>
+          </button>
+
+          <!-- Dark / Light Theme Toggle -->
+          <button
+            id="theme-toggle-btn"
+            type="button"
+            class="w-9 h-9 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-center text-slate-600 dark:text-amber-400 hover:scale-105 active:scale-95 transition"
+            aria-label="Toggle Theme"
+            title="Toggle Dark / Light Mode"
+          >
+            <span id="theme-icon">🌙</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Compact Date Switcher Pill -->
+      <nav class="bg-white dark:bg-slate-900 px-3 py-1.5 rounded-2xl shadow-sm border border-slate-200/70 dark:border-slate-800/80 flex items-center justify-between">
+        <button
+          id="date-prev-btn"
+          type="button"
+          class="w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 transition text-xs font-bold"
+          title="Previous Day"
+        >
+          ❮
+        </button>
+
+        <div class="text-center relative cursor-pointer" id="date-center-btn">
+          <p id="date-label-primary" class="text-xs font-bold text-slate-900 dark:text-white leading-tight">Today</p>
+          <p id="date-label-sub" class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">28 Oct, 2026</p>
+          <input
+            id="date-native-picker"
+            type="date"
+            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+            title="Select Date"
+          />
+        </div>
+
+        <div class="flex items-center gap-1">
+          <button
+            id="date-today-btn"
+            type="button"
+            class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-400 transition"
+          >
+            Today
+          </button>
+          <button
+            id="date-next-btn"
+            type="button"
+            class="w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 transition text-xs font-bold"
+            title="Next Day"
+          >
+            ❯
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- TAB SCREENS CONTAINER (NO LONG SCROLLING, ONLY ACTIVE TAB DISPLAYED) -->
+    <main class="flex-1 px-4 pb-20 overflow-hidden flex flex-col">
+
+      <!-- ============================================================== -->
+      <!-- TAB 1: HOME (DASHBOARD WITH SIDE-BY-SIDE CALORIE & WATER RINGS) -->
+      <!-- ============================================================== -->
+      <section id="tab-home" class="tab-content flex-1 flex flex-col justify-between space-y-3">
+        
+        <!-- MAIN HERO CARD: SIDE-BY-SIDE CALORIE RING + HYDRATION WATER RING -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+          
+          <div class="grid grid-cols-2 gap-3 items-center divide-x divide-slate-100 dark:divide-slate-800">
+            
+            <!-- LEFT COLUMN: CALORIE REMAINING RING -->
+            <div class="flex flex-col items-center justify-center pr-1 text-center">
+              <span id="lbl-energy-title" class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                Energy (kcal)
+              </span>
+
+              <div class="relative w-32 h-32 flex items-center justify-center">
+                <svg class="w-32 h-32 -rotate-90" viewBox="0 0 100 100">
+                  <!-- Background Track -->
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="#f1f5f9"
+                    class="dark:stroke-slate-800"
+                    stroke-width="8.5"
+                    fill="none"
+                  />
+                  <!-- Segment 1: Carbs (Amber) -->
+                  <circle
+                    id="svg-ring-carbs"
+                    class="ring-arc"
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="#f59e0b"
+                    stroke-width="8.5"
+                    stroke-dasharray="0 251.33"
+                    stroke-dashoffset="0"
+                    fill="none"
+                  />
+                  <!-- Segment 2: Protein (Purple) -->
+                  <circle
+                    id="svg-ring-protein"
+                    class="ring-arc"
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="#8b5cf6"
+                    stroke-width="8.5"
+                    stroke-dasharray="0 251.33"
+                    stroke-dashoffset="0"
+                    fill="none"
+                  />
+                  <!-- Segment 3: Fats (Rose) -->
+                  <circle
+                    id="svg-ring-fat"
+                    class="ring-arc"
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="#f43f5e"
+                    stroke-width="8.5"
+                    stroke-dasharray="0 251.33"
+                    stroke-dashoffset="0"
+                    fill="none"
+                  />
+                </svg>
+
+                <div class="absolute inset-0 flex flex-col items-center justify-center select-none">
+                  <span id="center-remaining-cal" class="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
+                    —
+                  </span>
+                  <span id="center-status-label" class="text-[9px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500 mt-1">
+                    remaining
+                  </span>
+                </div>
+              </div>
+
+              <!-- Compact percentage & mode toggle -->
+              <button
+                id="ring-mode-btn"
+                type="button"
+                class="mt-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+              >
+                <span id="center-ring-pct">0%</span> <span id="lbl-of-goal">of Goal</span> ⇄
+              </button>
+            </div>
+
+            <!-- RIGHT COLUMN: HYDRATION WATER INTAKE RING & METHODS -->
+            <div id="card-hydration-hero" class="flex flex-col items-center justify-center pl-2 text-center cursor-pointer group" title="Click to open Hydration Methods & Studio">
+              <span id="lbl-hydration-title" class="text-[11px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:scale-105 transition-transform">
+                <span>💧</span> Hydration
+              </span>
+
+              <div class="relative w-32 h-32 flex items-center justify-center">
+                <svg class="w-32 h-32 -rotate-90" viewBox="0 0 100 100">
+                  <!-- Water Background Track -->
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="#f1f5f9"
+                    class="dark:stroke-slate-800"
+                    stroke-width="8.5"
+                    fill="none"
+                  />
+                  <!-- Water Progress Arc -->
+                  <circle
+                    id="svg-water-ring"
+                    class="ring-arc"
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="#06b6d4"
+                    stroke-width="8.5"
+                    stroke-linecap="round"
+                    stroke-dasharray="0 251.33"
+                    stroke-dashoffset="0"
+                    fill="none"
+                  />
+                </svg>
+
+                <div class="absolute inset-0 flex flex-col items-center justify-center select-none">
+                  <div class="flex items-baseline justify-center">
+                    <span id="water-current-val" class="text-2xl font-black text-cyan-600 dark:text-cyan-400 tracking-tight leading-none">
+                      0
+                    </span>
+                    <span class="text-[10px] text-cyan-700 dark:text-cyan-300 font-bold ml-0.5">ml</span>
+                  </div>
+                  <span class="text-[9px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500 mt-1">
+                    / <span id="water-goal-display">2500</span> ml
+                  </span>
+                </div>
+              </div>
+
+              <!-- Quick Water 1-Tap Shortcuts: Sip (+25ml) & Gulp (+50ml) (User requested) + Undo & Open Studio -->
+              <div class="flex items-center gap-1 mt-1.5" onclick="event.stopPropagation()">
+                <button
+                  type="button"
+                  data-quick-water="25"
+                  class="quick-water-btn px-2 py-1 rounded-xl bg-cyan-50 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-300 font-extrabold text-[10px] border border-cyan-200/80 dark:border-cyan-800 transition active:scale-95 shadow-xs flex items-center gap-0.5"
+                  title="Log 1 Sip (25ml)"
+                >
+                  <span>🍵</span> <span id="lbl-quick-sip">Sip +25</span>
+                </button>
+                <button
+                  type="button"
+                  data-quick-water="50"
+                  class="quick-water-btn px-2 py-1 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-extrabold text-[10px] transition active:scale-95 shadow-xs flex items-center gap-0.5"
+                  title="Log 1 Gulp (50ml)"
+                >
+                  <span>🥤</span> <span id="lbl-quick-gulp">Gulp +50</span>
+                </button>
+                <button
+                  id="water-quick-minus-btn"
+                  type="button"
+                  class="w-6 h-6 rounded-lg text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 text-xs font-black flex items-center justify-center transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                  title="Undo -25ml"
+                >
+                  -
+                </button>
+              </div>
+
+              <!-- Interactive Clickable Link to Open Hydration Studio Modal -->
+              <button
+                type="button"
+                id="btn-open-hydration-modal"
+                class="mt-1 text-[9px] font-extrabold text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-0.5 transition"
+              >
+                <span id="lbl-open-hyd-modal">💧 All Methods / সব পদ্ধতি ➔</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- 3 KEY STATS (EATEN | GOAL | BMR) -->
+          <div class="grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-800 text-center pt-2.5 border-t border-slate-100 dark:border-slate-800">
+            <div>
+              <p id="stat-eaten-cal" class="text-lg font-black text-slate-900 dark:text-white">0</p>
+              <p id="lbl-eaten" class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">Eaten</p>
+            </div>
+            <div>
+              <p id="stat-goal-cal" class="text-lg font-black text-emerald-600 dark:text-emerald-400">2,000</p>
+              <p id="lbl-goal" class="text-[10px] font-semibold text-emerald-700/80 dark:text-emerald-400/80 uppercase tracking-wider mt-0.5">Goal</p>
+            </div>
+            <div>
+              <p id="stat-bmr-cal" class="text-lg font-black text-slate-900 dark:text-white">1,520</p>
+              <p id="lbl-bmr-stat" class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">BMR</p>
+            </div>
+          </div>
+
+          <!-- MACRO PROGRESS BARS -->
+          <div class="grid grid-cols-3 gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <!-- Protein -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-2xl">
+              <div class="flex items-center justify-between text-[11px] font-bold">
+                <span id="lbl-macro-pro" class="text-purple-600 dark:text-purple-400">Protein</span>
+                <span class="text-slate-900 dark:text-white"><span id="macro-pro-val">0</span>g</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mt-1.5 overflow-hidden">
+                <div id="bar-protein" class="h-full bg-purple-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+              <p class="text-[9px] text-slate-400 mt-1 text-right"><span id="lbl-pro-target">Goal</span>: <span id="macro-pro-goal">120</span>g</p>
+            </div>
+
+            <!-- Carbs -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-2xl">
+              <div class="flex items-center justify-between text-[11px] font-bold">
+                <span id="lbl-macro-carbs" class="text-amber-600 dark:text-amber-400">Carbs</span>
+                <span class="text-slate-900 dark:text-white"><span id="macro-carbs-val">0</span>g</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mt-1.5 overflow-hidden">
+                <div id="bar-carbs" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+              <p class="text-[9px] text-slate-400 mt-1 text-right"><span id="lbl-carb-target">Goal</span>: <span id="macro-carbs-goal">250</span>g</p>
+            </div>
+
+            <!-- Fats -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-2xl">
+              <div class="flex items-center justify-between text-[11px] font-bold">
+                <span id="lbl-macro-fats" class="text-rose-600 dark:text-rose-400">Fats</span>
+                <span class="text-slate-900 dark:text-white"><span id="macro-fats-val">0</span>g</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mt-1.5 overflow-hidden">
+                <div id="bar-fats" class="h-full bg-rose-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+              <p class="text-[9px] text-slate-400 mt-1 text-right"><span id="lbl-fat-target">Goal</span>: <span id="macro-fats-goal">65</span>g</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLINICAL HEALTH GUARD CARD (DIABETES GLUCOSE SHIELD & BP SODIUM SHIELD) -->
+        <div id="clinical-guard-card" class="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 flex items-center justify-center text-sm font-black shadow-xs">
+                🛡️
+              </span>
+              <div>
+                <h3 id="lbl-cguard-title" class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  Clinical Health Guard
+                </h3>
+                <p id="lbl-cguard-sub" class="text-[10px] text-slate-400 font-semibold">
+                  Personalized Medical Nutrition Monitoring
+                </p>
+              </div>
+            </div>
+            <!-- Overall Status Badge -->
+            <span id="cguard-overall-badge" class="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 flex items-center gap-1 shadow-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="cguard-overall-status">All Vitals Optimal</span>
+            </span>
+          </div>
+
+          <!-- Dual Condition Panels Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs pt-1">
+            
+            <!-- Panel 1: Heart & BP Sodium Shield -->
+            <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-extrabold text-[11px] text-slate-800 dark:text-slate-100 flex items-center gap-1">
+                  <span>❤️</span> <span id="lbl-cguard-bp-title">Heart &amp; BP Sodium Guard</span>
+                </span>
+                <span id="cguard-bp-badge" class="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                  Safe Zone
+                </span>
+              </div>
+              <div>
+                <div class="flex items-baseline justify-between text-[10px] font-bold">
+                  <span class="text-slate-500 dark:text-slate-400" id="lbl-cguard-na-intake">Sodium Intake</span>
+                  <span class="text-slate-900 dark:text-white"><strong id="cguard-na-val">0</strong> / <span id="cguard-na-limit">1,500</span> mg</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mt-1.5 overflow-hidden">
+                  <div id="bar-cguard-na" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium" id="cguard-bp-tip">
+                DASH Protocol: Strict &lt;1,500mg limit for hypertension.
+              </p>
+            </div>
+
+            <!-- Panel 2: Diabetes & Glucose Spike Shield -->
+            <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-extrabold text-[11px] text-slate-800 dark:text-slate-100 flex items-center gap-1">
+                  <span>🩸</span> <span id="lbl-cguard-sugar-title">Diabetes Glucose Shield</span>
+                </span>
+                <span id="cguard-sugar-badge" class="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                  Normal Load
+                </span>
+              </div>
+              <div>
+                <div class="flex items-baseline justify-between text-[10px] font-bold">
+                  <span class="text-slate-500 dark:text-slate-400" id="lbl-cguard-carb-spike">Max Meal Carb Load</span>
+                  <span class="text-slate-900 dark:text-white"><strong id="cguard-max-meal-carb">0</strong>g <span class="text-[9px] text-slate-400">(Safe &lt;45g)</span></span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mt-1.5 overflow-hidden">
+                  <div id="bar-cguard-carb" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+              <p class="text-[9px] text-slate-400 font-medium" id="cguard-sugar-tip">
+                ADA Target: Limit single meal carbs to &lt;45g to prevent postprandial glucose surges.
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Dynamic Live Clinical Advisory Box -->
+          <div id="cguard-advisory-box" class="p-2.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 flex items-start gap-2 text-xs">
+            <span class="text-base shrink-0 mt-0.5">🩺</span>
+            <p id="cguard-advisory-text" class="text-[11px] text-emerald-900 dark:text-emerald-200 font-semibold leading-relaxed">
+              Medical Nutrition Active: Sodium and carbohydrate loads are balanced for cardiovascular &amp; metabolic health.
+            </p>
+          </div>
+        </div>
+
+        <!-- QUICK MEAL SUMMARY SHORTCUT CARD (Clean & Compact) -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-3.5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-lg">🍽️</span>
+            <div>
+              <p id="lbl-meals-overview" class="text-xs font-bold text-slate-900 dark:text-white">Meals Overview</p>
+              <p class="text-[11px] text-slate-400">
+                <span id="quick-items-count">7</span> <span id="lbl-foods-logged">foods logged for this date</span>
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            id="go-to-meals-tab-btn"
+            class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center gap-1"
+          >
+            <span id="lbl-view-meals">View Meals</span>
+            <span>➔</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 2: MEALS (4 MEAL SLOTS: BREAKFAST, LUNCH, DINNER, SNACKS) -->
+      <!-- ============================================================== -->
+      <section id="tab-meals" class="tab-content flex-1 hidden space-y-3 overflow-y-auto no-scrollbar pb-6">
+        
+        <div class="flex items-center justify-between px-1">
+          <div>
+            <h2 id="lbl-todays-meals" class="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">Today's Meals</h2>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] text-slate-400">Total: <strong id="meals-tab-total-cal" class="text-emerald-600 font-extrabold">0</strong> kcal</span>
+              <span id="past-date-lock-hint" class="hidden text-[9px] font-black px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">🔒 Past Log Locked</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            id="btn-copy-all-yesterday"
+            class="text-[10px] font-bold px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800 transition flex items-center gap-1 active:scale-95 shadow-sm"
+            title="Copy all meals logged yesterday to this day"
+          >
+            <span>📋</span> <span id="lbl-copy-all-yest">Copy Yesterday</span>
+          </button>
+        </div>
+
+        <!-- 1. BREAKFAST -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-3.5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🥣</span>
+              <div>
+                <h3 id="lbl-slot-breakfast" class="text-xs font-extrabold text-slate-900 dark:text-white">Breakfast</h3>
+                <p class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400"><span id="meal-cal-breakfast">0</span> kcal</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button
+                type="button"
+                data-copy-yesterday="breakfast"
+                class="btn-copy-yesterday px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold transition flex items-center gap-1 active:scale-95"
+                title="Copy yesterday's breakfast"
+              >
+                <span>📋</span> <span class="lbl-copy-slot-yest">Yesterday</span>
+              </button>
+              <button
+              type="button"
+              data-add-target-meal="breakfast"
+              class="add-meal-slot-btn px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 text-xs font-bold hover:bg-emerald-100 transition"
+            >
+              + Add Food
+            </button>
+            </div>
+          </div>
+          <ul id="list-breakfast" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs"></ul>
+        </div>
+
+        <!-- 2. LUNCH -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-3.5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🍛</span>
+              <div>
+                <h3 id="lbl-slot-lunch" class="text-xs font-extrabold text-slate-900 dark:text-white">Lunch</h3>
+                <p class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400"><span id="meal-cal-lunch">0</span> kcal</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button
+                type="button"
+                data-copy-yesterday="lunch"
+                class="btn-copy-yesterday px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold transition flex items-center gap-1 active:scale-95"
+                title="Copy yesterday's lunch"
+              >
+                <span>📋</span> <span class="lbl-copy-slot-yest">Yesterday</span>
+              </button>
+              <button
+              type="button"
+              data-add-target-meal="lunch"
+              class="add-meal-slot-btn px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 text-xs font-bold hover:bg-emerald-100 transition"
+            >
+              + Add Food
+            </button>
+            </div>
+          </div>
+          <ul id="list-lunch" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs"></ul>
+        </div>
+
+        <!-- 3. DINNER -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-3.5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🍲</span>
+              <div>
+                <h3 id="lbl-slot-dinner" class="text-xs font-extrabold text-slate-900 dark:text-white">Dinner</h3>
+                <p class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400"><span id="meal-cal-dinner">0</span> kcal</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button
+                type="button"
+                data-copy-yesterday="dinner"
+                class="btn-copy-yesterday px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold transition flex items-center gap-1 active:scale-95"
+                title="Copy yesterday's dinner"
+              >
+                <span>📋</span> <span class="lbl-copy-slot-yest">Yesterday</span>
+              </button>
+              <button
+              type="button"
+              data-add-target-meal="dinner"
+              class="add-meal-slot-btn px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 text-xs font-bold hover:bg-emerald-100 transition"
+            >
+              + Add Food
+            </button>
+            </div>
+          </div>
+          <ul id="list-dinner" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs"></ul>
+        </div>
+
+        <!-- 4. SNACKS -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-3.5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🥜</span>
+              <div>
+                <h3 id="lbl-slot-snacks" class="text-xs font-extrabold text-slate-900 dark:text-white">Snacks</h3>
+                <p class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400"><span id="meal-cal-snacks">0</span> kcal</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button
+                type="button"
+                data-copy-yesterday="snacks"
+                class="btn-copy-yesterday px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold transition flex items-center gap-1 active:scale-95"
+                title="Copy yesterday's snacks"
+              >
+                <span>📋</span> <span class="lbl-copy-slot-yest">Yesterday</span>
+              </button>
+              <button
+              type="button"
+              data-add-target-meal="snacks"
+              class="add-meal-slot-btn px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 text-xs font-bold hover:bg-emerald-100 transition"
+            >
+              + Add Food
+            </button>
+            </div>
+          </div>
+          <ul id="list-snacks" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs"></ul>
+        </div>
+
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 3: ADD FOOD (SINGLE FOOD & COMBINATION MEAL BUILDER)        -->
+      <!-- ============================================================== -->
+      <section id="tab-add" class="tab-content flex-1 hidden space-y-3 overflow-y-auto no-scrollbar pb-6">
+        
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-3.5">
+          
+          <!-- Mode Switcher: Single Item vs Combination Meal -->
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+            <div>
+              <h2 id="lbl-log-food-title" class="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">Log Food by Weight</h2>
+              <p id="lbl-log-food-sub" class="text-[11px] text-slate-400">Search ingredients or log a combined meal</p>
+            </div>
+            <!-- Toggle Pills -->
+            <div class="flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-[11px] font-bold">
+              <button type="button" id="btn-mode-single" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white shadow-sm transition">Single</button>
+              <button type="button" id="btn-mode-combo" class="px-2.5 py-1 rounded-lg text-slate-600 dark:text-slate-400 transition">Combo Meal</button>
+            </div>
+          </div>
+
+          <!-- Target Meal Slot Selector -->
+          <div class="grid grid-cols-4 gap-1 p-1 rounded-2xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-center">
+            <button type="button" data-slot="breakfast" class="slot-pill py-1.5 rounded-xl transition text-slate-600 dark:text-slate-400">Breakfast</button>
+            <button type="button" data-slot="lunch" class="slot-pill py-1.5 rounded-xl transition bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm font-bold">Lunch</button>
+            <button type="button" data-slot="dinner" class="slot-pill py-1.5 rounded-xl transition text-slate-600 dark:text-slate-400">Dinner</button>
+            <button type="button" data-slot="snacks" class="slot-pill py-1.5 rounded-xl transition text-slate-600 dark:text-slate-400">Snacks</button>
+          </div>
+
+          <!-- SUB-VIEW 1: SINGLE FOOD ENTRY FORM -->
+          <form id="add-food-form" class="space-y-3" novalidate>
+            <!-- Food Name Search Input -->
+            <div class="relative">
+              <label for="food-input-name" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <span id="lbl-food-name-input">Food Name</span>
+              </label>
+              <input
+                id="food-input-name"
+                type="text"
+                autocomplete="off"
+                placeholder="e.g. Cucumber, Curd, Rice, Chia Seeds..."
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                required
+              />
+              <ul id="search-suggestions" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl max-h-52 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700"></ul>
+            </div>
+
+            <!-- Grams Input -->
+            <div>
+              <label for="food-input-grams" class="block text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-1">
+                <span id="lbl-food-grams-input">Weight in Grams (g)</span>
+              </label>
+              <div class="relative">
+                <input
+                  id="food-input-grams"
+                  type="number"
+                  min="5"
+                  max="3000"
+                  step="5"
+                  value=""
+                  placeholder="100"
+                  class="w-full pl-3.5 pr-10 py-2.5 rounded-xl border-2 border-emerald-500/70 bg-emerald-50/20 dark:bg-slate-800 font-extrabold text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 font-bold text-xs text-emerald-700 dark:text-emerald-400">g</span>
+              </div>
+            </div>
+
+            <!-- Quick Gram Pills -->
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="text-[11px] font-semibold text-slate-400 mr-1" id="lbl-quick-grams-label">Quick:</span>
+              <button type="button" data-gp="50" class="gp-btn px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold transition">50g</button>
+              <button type="button" data-gp="100" class="gp-btn px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-xs font-bold transition">100g</button>
+              <button type="button" data-gp="150" class="gp-btn px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold transition">150g</button>
+              <button type="button" data-gp="200" class="gp-btn px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold transition">200g</button>
+              <button type="button" data-gp="250" class="gp-btn px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold transition">250g</button>
+            </div>
+
+            <!-- Household Portion Size Shortcuts (Zero-Friction Logging) -->
+            <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+              <span class="text-[11px] font-semibold text-slate-400 mr-1" id="lbl-portion-size-label">Portion:</span>
+              <button type="button" data-portion="katori" class="portion-btn px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 text-xs font-bold transition">🥣 1 Katori (150g)</button>
+              <button type="button" data-portion="piece" class="portion-btn px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition">🍽️ 1 Piece/Serving</button>
+              <button type="button" data-portion="cup" class="portion-btn px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition">☕ 1 Cup (200g)</button>
+              <button type="button" data-portion="tbsp" class="portion-btn px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition">🥄 1 Tbsp (15g)</button>
+            </div>
+
+            <!-- Live Calculation Preview -->
+            <div id="live-calc-box" class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span id="preview-item-name" class="font-extrabold text-emerald-900 dark:text-emerald-200">খাবার নির্বাচন করুন (Select Food)</span>
+                <span id="preview-item-cal" class="font-extrabold text-sm text-emerald-700 dark:text-emerald-400">0 kcal</span>
+              </div>
+              <div class="flex flex-wrap gap-1.5 text-[10px] font-bold">
+                <span class="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 dark:bg-purple-900/60 dark:text-purple-300">P: <span id="prev-p">0.0</span>g</span>
+                <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">C: <span id="prev-c">0.0</span>g</span>
+                <span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300">F: <span id="prev-f">0.0</span>g</span>
+                <span class="px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-800 dark:bg-cyan-900/60 dark:text-cyan-300">Ca: <span id="prev-ca">0</span>mg</span>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              id="submit-food-btn"
+              class="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1"
+            >
+              <span>+ Log Food to</span> <span id="submit-slot-name" class="capitalize">Lunch</span>
+            </button>
+          </form>
+
+          <!-- SUB-VIEW 2: COMBINATION FOOD / MULTI-INGREDIENT 5-COMPARTMENT BUILDER -->
+          <div id="combo-meal-box" class="hidden space-y-3 pt-1">
+            <div class="p-3.5 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider" id="lbl-combo-builder-title">Combination Meal (Up to 5 Compartments)</span>
+                  <p class="text-[10px] text-slate-400" id="lbl-combo-builder-sub">Type food name or select from premium menu</p>
+                </div>
+                <button
+                  type="button"
+                  id="btn-add-combo-row"
+                  class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-black transition shadow-sm flex items-center gap-1"
+                >
+                  <span>+</span> <span id="lbl-add-compartment">Add Food</span> (<span id="combo-compartment-count">2</span>/5)
+                </button>
+              </div>
+
+              <!-- Dynamic 5-Compartment Rows Container -->
+              <div id="combo-rows-container" class="space-y-2">
+                <!-- Rendered dynamically via JS with premium dropdowns & typing -->
+              </div>
+
+              <!-- Combined Live Nutrition Preview -->
+              <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200/80 dark:border-emerald-800/60 space-y-1.5">
+                <div class="flex items-center justify-between text-xs font-black text-emerald-900 dark:text-emerald-200">
+                  <span id="combo-preview-title">Combined Meal Summary</span>
+                  <span id="combo-total-cal" class="text-sm text-emerald-700 dark:text-emerald-400 font-black">0 kcal</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                  <span>Pro: <strong id="combo-total-pro" class="text-purple-600">0.0</strong>g</span>
+                  <span>•</span>
+                  <span>Carbs: <strong id="combo-total-carbs" class="text-amber-600">0.0</strong>g</span>
+                  <span>•</span>
+                  <span>Fat: <strong id="combo-total-fat" class="text-rose-600">0.0</strong>g</span>
+                  <span>•</span>
+                  <span>Ca: <strong id="combo-total-ca" class="text-cyan-600">0</strong>mg</span>
+                  <span>•</span>
+                  <span>Fiber: <strong id="combo-total-fiber" class="text-lime-600">0.0</strong>g</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                id="btn-log-custom-combo"
+                class="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1"
+              >
+                <span>+ Log Combination to</span> <span id="combo-slot-name" class="capitalize">Lunch</span>
+              </button>
+
+              <button
+                type="button"
+                id="btn-save-combo-preset"
+                class="w-full py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-extrabold text-xs transition active:scale-95 flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700"
+              >
+                <span>⭐</span> <span id="lbl-save-combo-btn">Save as Favorite Combo</span>
+              </button>
+            </div>
+
+            <!-- Saved Combo Presets Section -->
+            <div id="saved-combos-container" class="space-y-2 pt-1">
+              <div class="flex items-center justify-between px-1">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                  <span>⭐</span> <span id="lbl-saved-combos-header">Saved Custom Combos</span>
+                </p>
+                <span class="text-[10px] text-slate-400 font-bold" id="saved-combos-count">0 saved</span>
+              </div>
+              <div id="saved-combos-list" class="space-y-2"></div>
+            </div>
+
+
+          </div>
+        </div>
+
+        <!-- DEDICATED 3 COOKING OILS & KITCHEN SPOON MEASURING METHOD -->
+        <div id="oil-tracking-section" class="bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 id="lbl-oil-section-title" class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                <span>🍶</span> <span>Cooking Oil & Spoon Measure</span>
+              </h3>
+              <p id="lbl-oil-section-sub" class="text-[10px] text-slate-400 font-semibold">1-Tap spoon logging to capture stealth cooking calories</p>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+              ICMR: &lt;20g/day
+            </span>
+          </div>
+
+          <!-- 3 Oil Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <!-- 1. Mustard Oil -->
+            <div class="p-2.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span class="text-lg">🟡</span>
+                  <div class="truncate">
+                    <p class="font-extrabold text-xs text-slate-900 dark:text-white truncate" id="lbl-oil-mustard-name">Mustard Oil</p>
+                    <p class="text-[9px] text-amber-700 dark:text-amber-400 font-bold" id="lbl-oil-mustard-tag">High MUFA • 8.5% Omega-3</p>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 pt-0.5">
+                <button
+                  type="button"
+                  data-log-oil="mustard_oil"
+                  data-oil-grams="5"
+                  data-spoon="tsp"
+                  class="btn-quick-log-oil flex-1 py-1.5 px-1 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-amber-300/80 dark:border-amber-700 font-black text-[10px] hover:bg-amber-100 dark:hover:bg-amber-900/60 active:scale-95 transition text-center shadow-xs"
+                >
+                  +1 tsp (5ml/45kcal)
+                </button>
+                <button
+                  type="button"
+                  data-log-oil="mustard_oil"
+                  data-oil-grams="15"
+                  data-spoon="tbsp"
+                  class="btn-quick-log-oil flex-1 py-1.5 px-1 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-[10px] active:scale-95 transition text-center shadow-xs"
+                >
+                  +1 tbsp (15ml/133kcal)
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Olive Oil -->
+            <div class="p-2.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span class="text-lg">🫒</span>
+                  <div class="truncate">
+                    <p class="font-extrabold text-xs text-slate-900 dark:text-white truncate" id="lbl-oil-olive-name">Olive Oil</p>
+                    <p class="text-[9px] text-emerald-700 dark:text-emerald-400 font-bold" id="lbl-oil-olive-tag">Extra Virgin • Antioxidants</p>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 pt-0.5">
+                <button
+                  type="button"
+                  data-log-oil="olive_oil"
+                  data-oil-grams="5"
+                  data-spoon="tsp"
+                  class="btn-quick-log-oil flex-1 py-1.5 px-1 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-emerald-300/80 dark:border-emerald-700 font-black text-[10px] hover:bg-emerald-100 dark:hover:bg-emerald-900/60 active:scale-95 transition text-center shadow-xs"
+                >
+                  +1 tsp (5ml/45kcal)
+                </button>
+                <button
+                  type="button"
+                  data-log-oil="olive_oil"
+                  data-oil-grams="15"
+                  data-spoon="tbsp"
+                  class="btn-quick-log-oil flex-1 py-1.5 px-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] active:scale-95 transition text-center shadow-xs"
+                >
+                  +1 tbsp (15ml/133kcal)
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Coconut Oil -->
+            <div class="p-2.5 rounded-2xl bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-800/60 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span class="text-lg">🥥</span>
+                  <div class="truncate">
+                    <p class="font-extrabold text-xs text-slate-900 dark:text-white truncate" id="lbl-oil-coconut-name">Coconut Oil</p>
+                    <p class="text-[9px] text-cyan-700 dark:text-cyan-400 font-bold" id="lbl-oil-coconut-tag">Pure MCT • Lauric Acid</p>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 pt-0.5">
+                <button
+                  type="button"
+                  data-log-oil="coconut_oil"
+                  data-oil-grams="5"
+                  data-spoon="tsp"
+                  class="btn-quick-log-oil flex-1 py-1.5 px-1 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-cyan-300/80 dark:border-cyan-700 font-black text-[10px] hover:bg-cyan-100 dark:hover:bg-cyan-900/60 active:scale-95 transition text-center shadow-xs"
+                >
+                  +1 tsp (5ml/45kcal)
+                </button>
+                <button
+                  type="button"
+                  data-log-oil="coconut_oil"
+                  data-oil-grams="15"
+                  data-spoon="tbsp"
+                  class="btn-quick-log-oil flex-1 py-1.5 px-1 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-black text-[10px] active:scale-95 transition text-center shadow-xs"
+                >
+                  +1 tbsp (15ml/134kcal)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kitchen Spoon Measuring Method Box -->
+          <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1.5">
+            <p class="font-extrabold text-slate-800 dark:text-slate-200 text-[11px] flex items-center gap-1" id="lbl-oil-guide-title">
+              <span>📏</span> <span>Kitchen Spoon Measuring Method / চামচ পরিমাপ পদ্ধতি:</span>
+            </p>
+            <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-600 dark:text-slate-300 font-medium">
+              <div class="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+                <p class="font-bold text-slate-900 dark:text-white" id="lbl-guide-tsp-title">🥄 1 Teaspoon (tsp) = 5 ml / 45 kcal</p>
+                <p class="text-slate-400 mt-0.5" id="lbl-guide-tsp-sub">Small tea/spice spoon (~5g pure fat)</p>
+              </div>
+              <div class="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+                <p class="font-bold text-slate-900 dark:text-white" id="lbl-guide-tbsp-title">🥄 1 Tablespoon (tbsp) = 15 ml / 135 kcal</p>
+                <p class="text-slate-400 mt-0.5" id="lbl-guide-tbsp-sub">Standard dining spoon = 3 tsp (~15g fat)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preloaded Quick Food Selector (RELIABLE 1-TAP INSTANT ADD) -->
+        <div id="single-favorites-section" class="bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+              <span>⚡</span> <span id="lbl-quick-favorites">Common Favorites (1-Tap Instant Add)</span>
+            </p>
+            <span class="text-[10px] text-emerald-600 font-bold">Tap + to log directly</span>
+          </div>
+
+          <!-- Quick Food Cards Grid -->
+          <div class="grid grid-cols-2 gap-2" id="quick-food-chips"></div>
+        </div>
+
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 4: MINERALS (ESSENTIAL MICRONUTRIENTS)                      -->
+      <!-- ============================================================== -->
+      <section id="tab-minerals" class="tab-content flex-1 hidden space-y-3 overflow-y-auto no-scrollbar pb-6">
+        
+        <div class="flex items-center justify-between px-1">
+          <h2 id="lbl-minerals-header" class="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">Essential Minerals</h2>
+          <span class="text-xs text-slate-400">Calculated from logged grams</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 text-xs">
+          <!-- 1. Calcium -->
+          <div class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm cursor-pointer hover:border-cyan-400 transition" onclick="showMineralInfo('calcium')">
+            <p class="font-bold text-cyan-600 dark:text-cyan-400">🦴 <span id="lbl-min-ca">Calcium (Ca)</span></p>
+            <p class="text-lg font-black text-slate-900 dark:text-white mt-1"><span id="m-ca">0</span> <span class="text-xs font-normal text-slate-400">/ <span id="rda-ca-target">1000</span> mg</span></p>
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+              <div id="bar-m-ca" class="h-full bg-cyan-500 rounded-full transition-all duration-300" style="width: 20%"></div>
+            </div>
+            <p id="lbl-tip-ca" class="text-[9px] text-slate-400 mt-1">Milk, Curd, Sesame, Chia</p>
+          </div>
+
+          <!-- 2. Magnesium -->
+          <div class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm cursor-pointer hover:border-emerald-400 transition" onclick="showMineralInfo('magnesium')">
+            <p class="font-bold text-emerald-600 dark:text-emerald-400">⚡ <span id="lbl-min-mg">Magnesium (Mg)</span></p>
+            <p class="text-lg font-black text-slate-900 dark:text-white mt-1"><span id="m-mg">0</span> <span class="text-xs font-normal text-slate-400">/ <span id="rda-mg-target">400</span> mg</span></p>
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+              <div id="bar-m-mg" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 25%"></div>
+            </div>
+            <p id="lbl-tip-mg" class="text-[9px] text-slate-400 mt-1">Pumpkin seeds, Almonds, Moong</p>
+          </div>
+
+          <!-- 3. Sodium -->
+          <div class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm cursor-pointer hover:border-amber-400 transition" onclick="showMineralInfo('sodium')">
+            <p class="font-bold text-amber-600 dark:text-amber-400">🧂 <span id="lbl-min-na">Sodium (Na)</span></p>
+            <p class="text-lg font-black text-slate-900 dark:text-white mt-1"><span id="m-na">0</span> <span id="rda-na-target" class="text-xs font-normal text-slate-400">/ 2300 mg</span></p>
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+              <div id="bar-m-na" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 30%"></div>
+            </div>
+            <p id="lbl-tip-na" class="text-[9px] text-slate-400 mt-1">Limit under 2,300 mg daily</p>
+          </div>
+
+          <!-- 4. Iron -->
+          <div class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm cursor-pointer hover:border-rose-400 transition" onclick="showMineralInfo('iron')">
+            <p class="font-bold text-rose-600 dark:text-rose-400">🩸 <span id="lbl-min-fe">Iron (Fe)</span></p>
+            <p class="text-lg font-black text-slate-900 dark:text-white mt-1"><span id="m-fe">0.0</span> <span class="text-xs font-normal text-slate-400">/ <span id="rda-fe-target">18</span> mg</span></p>
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+              <div id="bar-m-fe" class="h-full bg-rose-500 rounded-full transition-all duration-300" style="width: 15%"></div>
+            </div>
+            <p id="lbl-tip-fe" class="text-[9px] text-slate-400 mt-1">Chana, Dal, Spinach, Egg</p>
+          </div>
+
+          <!-- 5. Potassium -->
+          <div class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm cursor-pointer hover:border-purple-400 transition" onclick="showMineralInfo('potassium')">
+            <p class="font-bold text-purple-600 dark:text-purple-400">🍌 <span id="lbl-min-k">Potassium (K)</span></p>
+            <p class="text-lg font-black text-slate-900 dark:text-white mt-1"><span id="m-k">0</span> <span class="text-xs font-normal text-slate-400">/ 3500 mg</span></p>
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+              <div id="bar-m-k" class="h-full bg-purple-500 rounded-full transition-all duration-300" style="width: 20%"></div>
+            </div>
+            <p id="lbl-tip-k" class="text-[9px] text-slate-400 mt-1">Banana, Coconut water, Potato</p>
+          </div>
+
+          <!-- 6. Dietary Fiber -->
+          <div class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm cursor-pointer hover:border-lime-400 transition" onclick="showMineralInfo('fiber')">
+            <p class="font-bold text-lime-600 dark:text-lime-400">🌿 <span id="lbl-min-fiber">Dietary Fiber</span></p>
+            <p class="text-lg font-black text-slate-900 dark:text-white mt-1"><span id="m-fiber">0.0</span> <span class="text-xs font-normal text-slate-400">/ <span id="rda-fiber-target">30</span> g</span></p>
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+              <div id="bar-m-fiber" class="h-full bg-lime-500 rounded-full transition-all duration-300" style="width: 35%"></div>
+            </div>
+            <p id="lbl-tip-fiber" class="text-[9px] text-slate-400 mt-1">Guava, Oats, Roti, Cucumber</p>
+          </div>
+
+          <!-- 7. Zinc (Zn) -->
+          <div class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm cursor-pointer hover:border-blue-400 transition" onclick="showMineralInfo('zinc')">
+            <p class="font-bold text-blue-600 dark:text-blue-400">🛡️ <span id="lbl-min-zn">Zinc (Zn)</span></p>
+            <p class="text-lg font-black text-slate-900 dark:text-white mt-1"><span id="m-zn">0.0</span> <span class="text-xs font-normal text-slate-400">/ <span id="rda-zn-target">15</span> mg</span></p>
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+              <div id="bar-m-zn" class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width: 25%"></div>
+            </div>
+            <p id="lbl-tip-zn" class="text-[9px] text-slate-400 mt-1">Pumpkin seeds, Cashews, Chana</p>
+          </div>
+
+          <!-- 8. Omega-3 -->
+          <div class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm cursor-pointer hover:border-teal-400 transition" onclick="showMineralInfo('omega3')">
+            <p class="font-bold text-teal-600 dark:text-teal-400">🐟 <span id="lbl-min-omega">Omega-3</span></p>
+            <p class="text-lg font-black text-slate-900 dark:text-white mt-1"><span id="m-omega">0.0</span> <span class="text-xs font-normal text-slate-400">/ <span id="rda-omega-target">1.6</span> g</span></p>
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+              <div id="bar-m-omega" class="h-full bg-teal-500 rounded-full transition-all duration-300" style="width: 30%"></div>
+            </div>
+            <p id="lbl-tip-omega" class="text-[9px] text-slate-400 mt-1">Flax seeds, Chia, Walnuts, Fish</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 5: PROFILE (PREMIUM CUSTOM POPOVER DROPDOWNS & BMR)         -->
+      <!-- ============================================================== -->
+      <section id="tab-profile" class="tab-content flex-1 hidden space-y-3.5 overflow-y-auto no-scrollbar pb-6">
+        
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 id="lbl-profile-title" class="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">Profile &amp; Scientific Guidance</h2>
+              <p id="lbl-profile-sub" class="text-xs text-slate-400">Mifflin-St Jeor formula calculates your BMR &amp; targets</p>
+            </div>
+          </div>
+
+          <form id="profile-form" class="space-y-3">
+            <div class="grid grid-cols-2 gap-2.5 text-xs">
+              
+              <!-- 1. Name -->
+              <div>
+                <label for="prof-name" class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <span id="lbl-prof-name">Name</span>
+                </label>
+                <input id="prof-name" type="text" value="" placeholder="আপনার নাম লিখুন..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500" />
+              </div>
+
+              <!-- 2. Language Premium Custom Dropdown -->
+              <div class="relative custom-dropdown-container" id="dropdown-lang">
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <span id="lbl-prof-lang">Language</span>
+                </label>
+                <button
+                  type="button"
+                  id="btn-dropdown-lang"
+                  class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-left flex items-center justify-between hover:border-emerald-500 transition shadow-sm font-bold text-slate-900 dark:text-white"
+                >
+                  <span id="display-prof-lang" class="truncate">বাংলা (Bengali)</span>
+                  <span class="text-[10px] text-emerald-600 font-black">▼</span>
+                </button>
+                <div
+                  id="menu-dropdown-lang"
+                  class="hidden absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden divide-y divide-slate-100 dark:divide-slate-700 custom-popover"
+                >
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition flex items-center justify-between" data-val="en">
+                    <span>English</span>
+                    <span class="text-[10px] text-slate-400">EN</span>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition flex items-center justify-between" data-val="bn">
+                    <span>বাংলা (Bengali)</span>
+                    <span class="text-[10px] text-emerald-600 font-bold">BN</span>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition flex items-center justify-between" data-val="hi">
+                    <span>हिंदी (Hindi)</span>
+                    <span class="text-[10px] text-slate-400">HI</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Age -->
+              <div>
+                <label for="prof-age" class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <span id="lbl-prof-age">Age</span>
+                </label>
+                <input id="prof-age" type="number" min="10" max="110" value="" placeholder="28" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500" />
+              </div>
+
+              <!-- 4. Gender Premium Custom Dropdown (Male, Female, Transgender) -->
+              <div class="relative custom-dropdown-container" id="dropdown-gender">
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <span id="lbl-prof-gender">Gender</span>
+                </label>
+                <button
+                  type="button"
+                  id="btn-dropdown-gender"
+                  class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-left flex items-center justify-between hover:border-emerald-500 transition shadow-sm font-bold text-slate-900 dark:text-white"
+                >
+                  <span id="display-prof-gender" class="truncate">👨 Male</span>
+                  <span class="text-[10px] text-emerald-600 font-black">▼</span>
+                </button>
+                <div
+                  id="menu-dropdown-gender"
+                  class="hidden absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden divide-y divide-slate-100 dark:divide-slate-700 custom-popover"
+                >
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="male">
+                    <p class="font-bold text-slate-900 dark:text-white">👨 <span class="gender-opt-male">Male</span></p>
+                    <p class="text-[9px] text-slate-400">Mifflin-St Jeor (+5)</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="female">
+                    <p class="font-bold text-slate-900 dark:text-white">👩 <span class="gender-opt-female">Female</span></p>
+                    <p class="text-[9px] text-slate-400">Mifflin-St Jeor (-161)</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="transgender">
+                    <p class="font-bold text-emerald-600 dark:text-emerald-400">⚧️ <span class="gender-opt-trans">Transgender</span></p>
+                    <p class="text-[9px] text-slate-400">Balanced median BMR (-78) &amp; RDA</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. Height -->
+              <div>
+                <label for="prof-height" class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <span id="lbl-prof-height">Height (cm)</span>
+                </label>
+                <input id="prof-height" type="number" min="100" max="250" value="" placeholder="175" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500" />
+              </div>
+
+              <!-- 6. Weight -->
+              <div>
+                <label for="prof-weight" class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <span id="lbl-prof-weight">Weight (kg)</span>
+                </label>
+                <input id="prof-weight" type="number" min="30" max="250" step="0.5" value="" placeholder="70" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500" />
+              </div>
+
+              <!-- 7. Activity Level Premium Custom Dropdown -->
+              <div class="col-span-2 relative custom-dropdown-container" id="dropdown-activity">
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <span id="lbl-prof-activity">Activity Level</span>
+                </label>
+                <button
+                  type="button"
+                  id="btn-dropdown-activity"
+                  class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-left flex items-center justify-between hover:border-emerald-500 transition shadow-sm font-bold text-slate-900 dark:text-white"
+                >
+                  <span id="display-prof-activity" class="truncate">🚶 Lightly Active (1-3 days/wk)</span>
+                  <span class="text-[10px] text-emerald-600 font-black">▼</span>
+                </button>
+                <div
+                  id="menu-dropdown-activity"
+                  class="hidden absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 custom-popover"
+                >
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="1.2">
+                    <p class="font-bold text-slate-900 dark:text-white">🛋️ Sedentary</p>
+                    <p class="text-[10px] text-slate-400">Little or no regular exercise (x1.2)</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="1.375">
+                    <p class="font-bold text-slate-900 dark:text-white">🚶 Lightly Active</p>
+                    <p class="text-[10px] text-slate-400">1-3 days/week exercise or brisk walking (x1.375)</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="1.55">
+                    <p class="font-bold text-slate-900 dark:text-white">🏃 Moderately Active</p>
+                    <p class="text-[10px] text-slate-400">3-5 days/week sports or gym (x1.55)</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="1.725">
+                    <p class="font-bold text-slate-900 dark:text-white">⚡ Very Active</p>
+                    <p class="text-[10px] text-slate-400">6-7 days/week hard training or physical job (x1.725)</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 8. 7 Scientific Health Goals Premium Custom Dropdown -->
+              <div class="col-span-2 relative custom-dropdown-container" id="dropdown-goal">
+                <label class="block font-bold text-emerald-700 dark:text-emerald-400 mb-1">
+                  <span id="lbl-prof-goal">Scientific Health Goal</span>
+                </label>
+                <button
+                  type="button"
+                  id="btn-dropdown-goal"
+                  class="w-full px-3 py-2.5 rounded-2xl border-2 border-emerald-500/80 bg-white dark:bg-slate-800 text-left flex items-center justify-between hover:border-emerald-600 transition shadow-sm font-bold text-slate-900 dark:text-white"
+                >
+                  <div class="truncate pr-2">
+                    <p id="display-prof-goal-title" class="text-xs font-black truncate">1. Muscle Retention &amp; Fat Loss</p>
+                    <p id="display-prof-goal-sub" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">-350 kcal deficit, 2.0g/kg Pro</p>
+                  </div>
+                  <span class="text-xs text-emerald-600 font-black">▼</span>
+                </button>
+                <div
+                  id="menu-dropdown-goal"
+                  class="hidden absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl max-h-64 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 custom-popover"
+                >
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="lean_cut">
+                    <p class="font-black text-xs text-slate-900 dark:text-white">1. Muscle Retention &amp; Fat Loss</p>
+                    <p class="text-[10px] text-slate-400">-350 kcal deficit, 2.0g/kg protein to preserve lean muscle</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="recomp">
+                    <p class="font-black text-xs text-slate-900 dark:text-white">2. Body Recomposition</p>
+                    <p class="text-[10px] text-slate-400">-150 kcal, 2.2g/kg protein (lose fat &amp; build muscle)</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="aggressive_cut">
+                    <p class="font-black text-xs text-slate-900 dark:text-white">3. Rapid Fat Loss / Cutting</p>
+                    <p class="text-[10px] text-slate-400">-500 kcal deficit for safe, accelerated fat burning</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="maintain">
+                    <p class="font-black text-xs text-slate-900 dark:text-white">4. Maintain Current Weight &amp; Vitality</p>
+                    <p class="text-[10px] text-slate-400">Exact TDEE calorie balance for hormonal health &amp; energy</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="clean_bulk">
+                    <p class="font-black text-xs text-slate-900 dark:text-white">5. Clean Muscle Bulk</p>
+                    <p class="text-[10px] text-slate-400">+250 kcal controlled surplus with 2.0g/kg protein</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="heavy_bulk">
+                    <p class="font-black text-xs text-slate-900 dark:text-white">6. Overall Weight &amp; Mass Gain</p>
+                    <p class="text-[10px] text-slate-400">+500 kcal surplus with high complex carbs</p>
+                  </div>
+                  <div class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-700 cursor-pointer transition" data-val="athletic">
+                    <p class="font-black text-xs text-slate-900 dark:text-white">7. Athletic Performance &amp; Stamina</p>
+                    <p class="text-[10px] text-slate-400">+150 kcal, 60% high glycogen carbs for sports</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BMR & TDEE Scientific Card -->
+            <div class="p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-2 text-xs">
+              <div class="grid grid-cols-2 gap-2 text-center">
+                <div class="bg-white dark:bg-slate-800 p-2 rounded-xl">
+                  <span class="text-[10px] text-slate-400 block font-medium">Body BMR (Basal Rate)</span>
+                  <strong id="calc-bmr" class="text-sm text-slate-900 dark:text-white font-black">1,520 kcal</strong>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-2 rounded-xl">
+                  <span class="text-[10px] text-slate-400 block font-medium">TDEE (Daily Burn)</span>
+                  <strong id="calc-tdee" class="text-sm text-slate-900 dark:text-white font-black">2,090 kcal</strong>
+                </div>
+              </div>
+
+              <div class="p-2.5 bg-white/80 dark:bg-slate-800/80 rounded-xl space-y-1">
+                <p class="font-bold text-emerald-800 dark:text-emerald-300">
+                  Target: <span id="calc-rec-cal">1,740</span> kcal • Pro: <span id="calc-rec-pro">140</span>g • Carbs: <span id="calc-rec-carbs">180</span>g • Fats: <span id="calc-rec-fats">51</span>g
+                </p>
+                <p class="text-[10px] text-slate-400 italic">
+                  <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 inline-flex items-center justify-center align-middle mr-1 shrink-0"><svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Mifflin-St Jeor formula calculates &amp; locks your target scientifically
+                </p>
+              </div>
+            </div>
+
+            <!-- Scientifically Locked Targets Card (Non-editable) -->
+            <div class="p-3.5 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/40 border-2 border-emerald-500/50 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-base select-none">🔒</span>
+                  <span id="lbl-locked-target-title" class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                    Scientific Targets Locked
+                  </span>
+                </div>
+                <span id="badge-locked-status" class="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/80 dark:text-emerald-300">
+                  <span id="lbl-badge-status">Editable</span>
+                </span>
+              </div>
+              <p id="lbl-locked-target-sub" class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                Suggested targets are calculated from your body metrics and goal. You can override any value. This is a tracking aid, not medical advice.
+              </p>
+              
+              <!-- Custom targets (optional). Blank = use the suggested value. -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="custom-targets-box">
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                  <span id="lbl-tgt-cal">Calories (kcal)</span>
+                  <input id="tgt-cal" type="number" inputmode="numeric" min="1000" max="6000" step="10" placeholder="auto" class="mt-1 w-full px-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500" />
+                </label>
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                  <span id="lbl-tgt-pro">Protein (g)</span>
+                  <input id="tgt-pro" type="number" inputmode="numeric" min="20" max="400" step="1" placeholder="auto" class="mt-1 w-full px-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500" />
+                </label>
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                  <span id="lbl-tgt-carbs">Carbs (g)</span>
+                  <input id="tgt-carbs" type="number" inputmode="numeric" min="20" max="800" step="1" placeholder="auto" class="mt-1 w-full px-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500" />
+                </label>
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                  <span id="lbl-tgt-fat">Fat (g)</span>
+                  <input id="tgt-fat" type="number" inputmode="numeric" min="10" max="300" step="1" placeholder="auto" class="mt-1 w-full px-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500" />
+                </label>
+              </div>
+              <button type="button" id="tgt-reset" class="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                <span id="lbl-tgt-reset">Reset to suggested targets</span>
+              </button>
+
+              <!-- 4 Metrics Grid (active targets) -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-center">
+                <div class="p-2 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200/80 dark:border-slate-800 shadow-sm">
+                  <span id="lbl-locked-cal" class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Calories</span>
+                  <strong id="locked-target-cal" class="text-sm font-black text-emerald-600 dark:text-emerald-400">1,740 kcal</strong>
+                  <span class="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5"><span class="target-tag">Suggested</span></span>
+                </div>
+                <div class="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                  <span id="lbl-locked-pro" class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Protein</span>
+                  <strong id="locked-target-pro" class="text-sm font-black text-purple-600 dark:text-purple-400">140g</strong>
+                  <span class="text-[9px] text-purple-600 dark:text-purple-400 font-bold block mt-0.5"><span class="target-tag">Suggested</span></span>
+                </div>
+                <div class="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                  <span id="lbl-locked-carbs" class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Carbs</span>
+                  <strong id="locked-target-carbs" class="text-sm font-black text-amber-600 dark:text-amber-400">180g</strong>
+                  <span class="text-[9px] text-amber-600 dark:text-amber-400 font-bold block mt-0.5"><span class="target-tag">Suggested</span></span>
+                </div>
+                <div class="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                  <span id="lbl-locked-fat" class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Fats</span>
+                  <strong id="locked-target-fat" class="text-sm font-black text-rose-600 dark:text-rose-400">51g</strong>
+                  <span class="text-[9px] text-rose-600 dark:text-rose-400 font-bold block mt-0.5"><span class="target-tag">Suggested</span></span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 font-extrabold text-xs shadow-md transition"
+            >
+              <span id="lbl-save-profile-btn">Save Profile Settings</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Health Profile & Medical Conditions Card -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 id="lbl-health-cond-title" class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Health Profile &amp; Conditions</h3>
+              <p class="text-[10px] text-slate-400" id="lbl-health-cond-sub">Medical conditions recorded during onboarding</p>
+            </div>
+            <button
+              type="button"
+              id="btn-rerun-onboarding"
+              class="text-[10px] font-black px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800 transition flex items-center gap-1 active:scale-95"
+              title="Re-run Onboarding Setup Wizard"
+            >
+              <span>🔄</span> <span id="lbl-rerun-wizard-btn">Re-run Setup</span>
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700">
+              <span class="text-[9px] text-slate-400 font-bold block" id="lbl-card-diabetic-title">Diabetes</span>
+              <strong class="text-xs font-black text-slate-800 dark:text-slate-100 block mt-0.5" id="val-profile-diabetic">None</strong>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700">
+              <span class="text-[9px] text-slate-400 font-bold block" id="lbl-card-bp-title">Blood Pressure</span>
+              <strong class="text-xs font-black text-slate-800 dark:text-slate-100 block mt-0.5" id="val-profile-bp">Normal</strong>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700">
+              <span class="text-[9px] text-slate-400 font-bold block" id="lbl-card-mobility-title">Mobility</span>
+              <strong class="text-xs font-black text-slate-800 dark:text-slate-100 block mt-0.5" id="val-profile-mobility">Fully Mobile</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Backup & Restore Card -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-sm border border-slate-200/80 dark:border-slate-800/80 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 id="lbl-backup-title" class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Data Backup &amp; Storage</h3>
+            <span id="storage-engine-badge" class="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+              🟢 IndexedDB Active
+            </span>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <button
+              id="export-backup-btn"
+              type="button"
+              class="py-2.5 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold hover:bg-emerald-100 transition"
+            >
+              📥 Export JSON
+            </button>
+            <label class="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition text-center cursor-pointer">
+              📤 Import JSON
+              <input id="import-backup-input" type="file" accept=".json" class="hidden" />
+            </label>
+          </div>
+          <p id="backup-notice" class="hidden text-xs text-emerald-600 font-bold text-center">Data restored successfully!</p>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- MINIMALIST BOTTOM NAVIGATION BAR (FIXED WITH PIXEL-PERFECT SVG PLUS BUTTON) -->
+    <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 py-2 px-3 shadow-lg">
+      <div class="max-w-md mx-auto flex items-center justify-around">
+        <!-- 1. Home Tab -->
+        <button
+          type="button"
+          data-tab="home"
+          class="nav-tab-btn flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 transition"
+        >
+          <span class="text-lg">🏠</span>
+          <span class="text-[10px] font-bold" id="nav-lbl-home">Home</span>
+        </button>
+
+        <!-- 2. Meals Tab -->
+        <button
+          type="button"
+          data-tab="meals"
+          class="nav-tab-btn flex flex-col items-center gap-0.5 text-slate-400 dark:text-slate-500 hover:text-emerald-600 transition"
+        >
+          <span class="text-lg">🍽️</span>
+          <span class="text-[10px] font-semibold" id="nav-lbl-meals">Meals</span>
+        </button>
+
+        <!-- 3. CENTER ACTION (+) BUTTON - PERFECTLY CENTERED SVG PLUS ICON -->
+        <button
+          type="button"
+          id="center-fab-btn"
+          data-tab="add"
+          class="nav-tab-btn w-12 h-12 -mt-5 rounded-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white shadow-lg flex items-center justify-center transition border-2 border-white dark:border-slate-800 ring-2 ring-emerald-500/20"
+          title="Add Food"
+        >
+          <!-- Beautiful Geometric SVG Plus Icon -->
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+
+        <!-- 4. Minerals Tab -->
+        <button
+          type="button"
+          data-tab="minerals"
+          class="nav-tab-btn flex flex-col items-center gap-0.5 text-slate-400 dark:text-slate-500 hover:text-emerald-600 transition"
+        >
+          <span class="text-lg">✨</span>
+          <span class="text-[10px] font-semibold" id="nav-lbl-minerals">Minerals</span>
+        </button>
+
+        <!-- 5. Profile Tab -->
+        <button
+          type="button"
+          data-tab="profile"
+          class="nav-tab-btn flex flex-col items-center gap-0.5 text-slate-400 dark:text-slate-500 hover:text-emerald-600 transition"
+        >
+          <span class="text-lg">👤</span>
+          <span class="text-[10px] font-semibold" id="nav-lbl-profile">Profile</span>
+        </button>
+      </div>
+    </nav>
+
+  </div> <!-- End App Shell -->
+
+    <!-- APPLICATION JAVASCRIPT ENGINE -->
+  <script src="src/js/config.js"></script>
+  <script src="src/data/foods.js"></script>
+  <script src="src/js/sound.js"></script>
+  <script src="src/js/app.js"></script>
+</body>
+</html>
